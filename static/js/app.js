@@ -1,26 +1,35 @@
+// Read the JSON file
+d3.json('samples.json').then(function(data) {
+
+    // Print the JSON arrays in the console
+    console.log(data);
+
+    // Create variable for the dropdown (select tag)
+    var select = d3.select('select');
+
+    // Append option tags for each ID in the names array
+    Object.entries(data.names).forEach(function([key, value]) {
+        console.log(key, value);
+        var option = select.append('option')
+        option.text(value)});
+})
+
 // Submit Button handler
-function handleSubmit() {
+function optionChanged() {
     // Prevent the page from refreshing
     d3.event.preventDefault();
   
     // Use D3 to select the dropdown menu
     var dropdownMenu = d3.select("#selDataset");
+
     // Assign the value of the dropdown menu option to a variable
-    var person = dropdownMenu.node().value;
+    var data = dropdownMenu.node().value;
 
     // Build the plot with the new person
-    buildPlot(person);
+    buildPlot(data);
   }
 
-// function unpack(rows, index) {
-//     return rows.map(function(row) {
-//       return row[index];
-//     });
-//   };
-
-
 // function buildPlot(person) {
-//   d3.json('../../samples.json').then(function(data) {
 
 //     // Grab values from the data json object
 //     var id = unpack(data.names);
@@ -58,4 +67,4 @@ function handleSubmit() {
 //   });
 // }
   
-// buildPlot();
+// buildPlot()
