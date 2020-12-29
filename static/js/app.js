@@ -12,6 +12,16 @@ d3.json('samples.json').then(function(data) {
         console.log(key, value);
         var option = select.append('option')
         option.text(value)});
+
+    // Create variable for subject of interest
+    soi = d3.select('#SelDataset').value
+    console.log(soi)
+
+    // Create a variable for the Demographic Info panel
+    var panel = d3.select('#sample-metadata')
+
+    // Append information on subject based on dropdown value
+
 })
 
 // Submit Button handler
