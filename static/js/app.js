@@ -1,3 +1,15 @@
+// Submit Button handler
+function optionChanged() {
+  
+    // Use D3 to select the dropdown menu
+    var dropdownMenu = d3.select("#selDataset").node();
+    
+    // Assign the dropdown menu option to a variable
+    var selectedOption = dropdownMenu.value;
+
+  console.log(selectedOption);
+};
+
 // Read the JSON file
 d3.json('samples.json').then(function(data) {
 
@@ -14,19 +26,19 @@ d3.json('samples.json').then(function(data) {
         option.text(value)});
 
     // Create variable for subject of interest
-    var soi = document.getElementById('selDataset');
-    console.log(soi.options[soi.selectedIndex].value);
-    var soi = soi.options[soi.selectedIndex].value;
-    console.log(soi)
+    var selectedOption = document.getElementById('selDataset');
+    console.log(selectedOption.options[selectedOption.selectedIndex].value);
+    var selectedOption = selectedOption.options[selectedOption.selectedIndex].value;
+    console.log(selectedOption)
 
     // Create a function that returns metadata based on id number
-    function filterMetaData(person) {
-        return person.id == soi;
+    function filterData(person) {
+        return person.id == selectedOption;
     }
 
     // Filter metadata by subject of interest
-    var filteredData = data.metadata.filter(filterMetaData);
-    console.log(filteredData);
+    var filteredData = data.metadata.filter(filterData);
+    console.log(filteredData[0]);
 
     // // Create a variable for the Demographic Info panel
     var panel = d3.select('.panel-body')
@@ -38,21 +50,57 @@ d3.json('samples.json').then(function(data) {
         row.text(`${key}: ${value}`);
     })
     
+    // Filter sample data by subject of interest
+    var filteredSample = data.samples.filter(filterData);
+    var filteredSample = filteredSample[0];
+    console.log(filteredSample);
+
+    // Pull data from samples for bubble chart plotting
+    sampleIDs = filteredSample.otu_ids;
+    sampleValues = filteredSample.sample_values;
+    sampleLabels = filteredSample.otu_labels;
+
+    // Slice the first 10 objects for bar chart plotting
+    slicedIDs = filteredSample.otu_ids.slice(0, 10);
+    slicedValues = filteredSample.sample_values.slice(0, 10);
+    slicedLabels = filteredSample.otu_labels.slice(0, 10);
+    console.log(slicedIDs, slicedValues, slicedLabels)
+
+    // Trace1 for the horizontal bar chart
+    var trace1 = {
+        x: slicedValues,
+        y: slicedIDs.toString(),
+        text: slicedLabels,
+        type: 'bar',
+        orientation: 'h'
+    };
+
+    var hbarChart = [trace1];
+
+    var layout1 = {
+        title: 'Top 10 Samples'
+    };
+
+    Plotly.newPlot('bar', hbarChart, layout1)
+
+    // Trace2 for the bubble chart
+    var trace2 = {
+        x: sampleIDs,
+        y: sampleValues,
+        text: sampleLabels,
+        mode: 'markers',
+        marker: {
+            color: sampleIDs,
+            size: sampleValues
+        }
+    };
+
+    var bubbleChart = [trace2]
+
+    var layout2 = {
+        title: 'All Sample Sizes',
+        showlegend: false
+    }
+
+    Plotly.newPlot('bubble', bubbleChart, layout2)
 });
-
-
-
-// // Submit Button handler
-// function optionChanged() {
-//     // Prevent the page from refreshing
-//     d3.event.preventDefault();
-  
-//     // Use D3 to select the dropdown menu
-//     var dropdownMenu = d3.select("#selDataset");
-
-//     // Assign the value of the dropdown menu option to a variable
-//     var data = dropdownMenu.node().value;
-
-//     // Build the plot with the new person
-//     buildPlot(data);
-//   }
