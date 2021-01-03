@@ -14,67 +14,45 @@ d3.json('samples.json').then(function(data) {
         option.text(value)});
 
     // Create variable for subject of interest
-    soi = d3.select('#SelDataset').value
+    var soi = document.getElementById('selDataset');
+    console.log(soi.options[soi.selectedIndex].value);
+    var soi = soi.options[soi.selectedIndex].value;
     console.log(soi)
 
-    // Create a variable for the Demographic Info panel
-    var panel = d3.select('#sample-metadata')
+    // Create a function that returns metadata based on id number
+    function filterMetaData(person) {
+        return person.id == soi;
+    }
+
+    // Filter metadata by subject of interest
+    var filteredData = data.metadata.filter(filterMetaData);
+    console.log(filteredData);
+
+    // // Create a variable for the Demographic Info panel
+    var panel = d3.select('.panel-body')
 
     // Append information on subject based on dropdown value
+    Object.entries(filteredData[0]).forEach(function([key, value]) {
+        console.log(key, value);
+        var row = panel.append('tr')
+        row.text(`${key}: ${value}`);
+    })
+    
+});
 
-})
 
-// Submit Button handler
-function optionChanged() {
-    // Prevent the page from refreshing
-    d3.event.preventDefault();
+
+// // Submit Button handler
+// function optionChanged() {
+//     // Prevent the page from refreshing
+//     d3.event.preventDefault();
   
-    // Use D3 to select the dropdown menu
-    var dropdownMenu = d3.select("#selDataset");
+//     // Use D3 to select the dropdown menu
+//     var dropdownMenu = d3.select("#selDataset");
 
-    // Assign the value of the dropdown menu option to a variable
-    var data = dropdownMenu.node().value;
+//     // Assign the value of the dropdown menu option to a variable
+//     var data = dropdownMenu.node().value;
 
-    // Build the plot with the new person
-    buildPlot(data);
-  }
-
-// function buildPlot(person) {
-
-//     // Grab values from the data json object
-//     var id = unpack(data.names);
-//     var ethnicity = data.metadata.ethnicity;
-//     var gender = data.metadata.gender;
-//     var age = data.metadata.age;
-//     var location = data.metadata.location;
-//     var bbtype = data.metadata.bbtype;
-//     var wfreq = data.metadata.wfreq;
-//     var otu_ids = unpack(data.samples.otu_ids, 0)
-//     var sample_values = unpack(data.samples.sample_values, 0)
- 
-//     // var trace1 = {
-//     //   type: "bar",
-//     //   x: sample_values,
-//     //   y: otu_ids,
-//     //   orientation: 'h'
-//     // };
-  
-//     // var data = [trace1];
-
-//     // var layout = {
-//     //   title: `Top Ten Bacteria`,
-//     //   xaxis: {
-//     //     autorange: true
-//     //   },
-//     //   yaxis: {
-//     //     autorange: true,
-//     //     type: "linear"
-//     //   }
-//     // };
-  
-//     // Plotly.newPlot("#bar", data, layout);
-  
-//   });
-// }
-  
-// buildPlot()
+//     // Build the plot with the new person
+//     buildPlot(data);
+//   }
