@@ -1,4 +1,4 @@
-// Submit Button handler
+// Change dashboard on dropdown
 function optionChanged() {
   
     // Use D3 to select the dropdown menu
@@ -7,100 +7,104 @@ function optionChanged() {
     // Assign the dropdown menu option to a variable
     var selectedOption = dropdownMenu.value;
 
-  console.log(selectedOption);
+    console.log(selectedOption);
+
+    getData();
 };
 
-// Read the JSON file
-d3.json('samples.json').then(function(data) {
+getData();
 
-    // Print the JSON arrays in the console
-    console.log(data);
+function getData() {
 
-    // Create variable for the dropdown (select tag)
-    var select = d3.select('select');
+    // Read the JSON file
+    d3.json('samples.json').then(function(data) {
 
-    // Append option tags for each ID in the names array
-    Object.entries(data.names).forEach(function([key, value]) {
-        console.log(key, value);
-        var option = select.append('option')
-        option.text(value)});
+        // Create variable for the dropdown (select tag)
+        var select = d3.select('select');
 
-    // Create variable for subject of interest
-    var selectedOption = document.getElementById('selDataset');
-    console.log(selectedOption.options[selectedOption.selectedIndex].value);
-    var selectedOption = selectedOption.options[selectedOption.selectedIndex].value;
-    console.log(selectedOption)
+        // Append option tags for each ID in the names array
+        Object.entries(data.names).forEach(function([key, value]) {
+            var option = select.append('option')
+            option.text(value)});
 
-    // Create a function that returns metadata based on id number
-    function filterData(person) {
-        return person.id == selectedOption;
-    }
+        // Create variable for subject of interest
+        var selectedOption = document.getElementById('selDataset');
+        var selectedOption = selectedOption.options[selectedOption.selectedIndex].value;
+        console.log(selectedOption)
 
-    // Filter metadata by subject of interest
-    var filteredData = data.metadata.filter(filterData);
-    console.log(filteredData[0]);
+        // Create a function that returns metadata based on id number
+        function filterData(person) {
+            return person.id == selectedOption;
+        };
 
-    // // Create a variable for the Demographic Info panel
-    var panel = d3.select('.panel-body')
+        // Filter metadata by subject of interest
+        var filteredData = data.metadata.filter(filterData);
+        console.log(filteredData[0]);
 
-    // Append information on subject based on dropdown value
-    Object.entries(filteredData[0]).forEach(function([key, value]) {
-        console.log(key, value);
-        var row = panel.append('tr')
-        row.text(`${key}: ${value}`);
-    })
-    
-    // Filter sample data by subject of interest
-    var filteredSample = data.samples.filter(filterData);
-    var filteredSample = filteredSample[0];
-    console.log(filteredSample);
+        // Create a variable for the Demographic Info panel
+        var panel = d3.select('.panel-body');
 
-    // Pull data from samples for bubble chart plotting
-    sampleIDs = filteredSample.otu_ids;
-    sampleValues = filteredSample.sample_values;
-    sampleLabels = filteredSample.otu_labels;
+        // Initialize panel
+        panel.selectAll('*').remove();
 
-    // Slice the first 10 objects for bar chart plotting
-    slicedIDs = filteredSample.otu_ids.slice(0, 10);
-    slicedValues = filteredSample.sample_values.slice(0, 10);
-    slicedLabels = filteredSample.otu_labels.slice(0, 10);
-    console.log(slicedIDs, slicedValues, slicedLabels)
+        // Append information on subject based on dropdown value
+        Object.entries(filteredData[0]).forEach(function([key, value]) {
+            var row = panel.append('tr')
+            row.text(`${key}: ${value}`);
+        })
+        
+        // Filter sample data by subject of interest
+        var filteredSample = data.samples.filter(filterData);
+        var filteredSample = filteredSample[0];
+        console.log(filteredSample);
 
-    // Trace1 for the horizontal bar chart
-    var trace1 = {
-        x: slicedValues,
-        y: slicedIDs.toString(),
-        text: slicedLabels,
-        type: 'bar',
-        orientation: 'h'
-    };
+        // Pull all data from samples for bubble chart plotting
+        sampleIDs = filteredSample.otu_ids;
+        sampleValues = filteredSample.sample_values;
+        sampleLabels = filteredSample.otu_labels;
 
-    var hbarChart = [trace1];
+        // Slice the first 10 objects for bar chart plotting
+        slicedIDs = filteredSample.otu_ids.slice(0, 10);
+        slicedValues = filteredSample.sample_values.slice(0, 10);
+        slicedLabels = filteredSample.otu_labels.slice(0, 10);
+        console.log(slicedIDs, slicedValues, slicedLabels)
 
-    var layout1 = {
-        title: 'Top 10 Samples'
-    };
+        // Trace1 for the horizontal bar chart
+        var trace1 = {
+            x: slicedValues,
+            y: slicedIDs.toString(),
+            text: slicedLabels,
+            type: 'bar',
+            orientation: 'h'
+        };
 
-    Plotly.newPlot('bar', hbarChart, layout1)
+        var hbarChart = [trace1];
 
-    // Trace2 for the bubble chart
-    var trace2 = {
-        x: sampleIDs,
-        y: sampleValues,
-        text: sampleLabels,
-        mode: 'markers',
-        marker: {
-            color: sampleIDs,
-            size: sampleValues
+        var layout1 = {
+            title: 'Top 10 Samples'
+        };
+
+        Plotly.newPlot('bar', hbarChart, layout1)
+
+        // Trace2 for the bubble chart
+        var trace2 = {
+            x: sampleIDs,
+            y: sampleValues,
+            text: sampleLabels,
+            mode: 'markers',
+            marker: {
+                color: sampleIDs,
+                size: sampleValues
+            }
+        };
+
+        var bubbleChart = [trace2]
+
+        var layout2 = {
+            title: 'All Sample Sizes',
+            showlegend: false
         }
-    };
 
-    var bubbleChart = [trace2]
-
-    var layout2 = {
-        title: 'All Sample Sizes',
-        showlegend: false
-    }
-
-    Plotly.newPlot('bubble', bubbleChart, layout2)
-});
+        Plotly.newPlot('bubble', bubbleChart, layout2)
+    });
+};
