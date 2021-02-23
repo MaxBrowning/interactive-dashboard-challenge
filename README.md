@@ -3,5 +3,5 @@ This challenge provided starter code for HTML. The challenge was to create an in
 
 The project limited us to using JavaScript, HTML, and D3.js.
 
------
-Project for Butler Data Analysis Bootcamp
+## Image of final product:
+![](https://github.com/MaxBrowning/plotly-challenge/blob/main/final_product_image.JPG)
